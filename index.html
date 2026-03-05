@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mrs. Olivera's 5th Grade Math Review</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+/* --- PROFESSIONAL THEME --- */
+:root{--p:#2563eb;--pd:#1e40af;--pl:#eff6ff;--a:#fbbf24;--bg:linear-gradient(135deg,#1e3a8a 0%,#3b82f6 50%,#93c5fd 100%);--c:rgba(255,255,255,0.98);--t:#0f172a;--tm:#64748b;--b:#e2e8f0;--ok:#10b981;--okb:#ecfdf5;--wa:#f59e0b;--wab:#fffbeb;--er:#ef4444;--erb:#fef2f2}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--t);margin:0;padding:20px;min-height:100vh;display:flex;flex-direction:column;align-items:center;background-attachment:fixed}
+.container{width:100%;max-width:900px;background:var(--c);backdrop-filter:blur(10px);border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.2);overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.3);min-height:600px;position:relative}
+
+/* --- TITLE PAGE --- */
+#title-page{padding:40px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;flex:1;animation:fadeIn .5s ease;position:relative;overflow:hidden}
+.main-title{font-size:3.5rem;font-weight:900;color:var(--pd);line-height:1.1;margin-bottom:10px;letter-spacing:-0.03em;z-index:2;position:relative}
+.sub-title{font-size:1.4rem;color:var(--tm);font-weight:500;margin-bottom:40px;max-width:600px;z-index:2;position:relative}
+.scores-btn { background: #fff; border: 2px solid var(--p); color: var(--p); padding: 12px 30px; border-radius: 30px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; z-index: 2; position: relative; margin-top: 20px;}
+.scores-btn:hover { background: var(--pl); }
+.math-decor { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+.sym { position: absolute; font-weight: 900; color: var(--p); opacity: 0.08; user-select: none; }
+.sym-plus { top: -10%; left: -5%; font-size: 15rem; transform: rotate(-15deg); }
+.sym-minus { top: 10%; right: -5%; font-size: 12rem; transform: rotate(15deg); }
+.sym-mult { bottom: -10%; left: 5%; font-size: 14rem; transform: rotate(10deg); }
+.sym-div { bottom: 10%; right: 10%; font-size: 10rem; transform: rotate(-10deg); }
+
+/* --- SET SELECTION --- */
+.set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; z-index: 2; width: 100%; max-width: 500px; margin-bottom: 20px; }
+.set-btn { background: linear-gradient(135deg,var(--p),var(--pd)); color: white; padding: 25px; border-radius: 16px; border: none; cursor: pointer; font-size: 1.5rem; font-weight: 800; box-shadow: 0 10px 20px -5px rgba(37,99,235,0.4); transition: all .3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.set-btn span { font-size: 1rem; font-weight: 500; opacity: 0.9; }
+.set-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 15px 30px -5px rgba(37,99,235,0.5); }
+.set-btn.b { background: linear-gradient(135deg,#059669,#047857); box-shadow: 0 10px 20px -5px rgba(5,150,105,0.4); }
+.set-btn.b:hover { box-shadow: 0 15px 30px -5px rgba(5,150,105,0.5); }
+
+/* --- HEADER & NAV --- */
+header{background:#fff;padding:25px 40px;border-bottom:1px solid var(--b);display:none;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:1.8rem;font-weight:900;color:var(--pd);letter-spacing:-.02em;text-transform:uppercase;line-height:1;max-width:70%}
+.btn-group { display: flex; gap: 10px; }
+.reset-btn{background:0 0;border:1px solid var(--b);color:var(--tm);padding:8px 16px;border-radius:6px;font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap}
+.reset-btn:hover{background:var(--erb);color:var(--er);border-color:var(--er)}
+.pg-bar{width:100%;height:8px;background:var(--b);display:none}.pg-fill{height:100%;background:linear-gradient(90deg,var(--p),#60a5fa);width:0%;transition:width .4s ease}
+
+/* --- QUIZ --- */
+.q-card{padding:40px;display:none;animation:fadeIn .4s ease-out}.q-card.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:2px solid #f1f5f9;padding-bottom:15px}
+.bdg{font-size:.8rem;font-weight:800;color:var(--p);text-transform:uppercase;background:var(--pl);padding:6px 10px;border-radius:6px}
+.pts{font-size:.8rem;font-weight:700;color:var(--tm);background:#f1f5f9;padding:6px 10px;border-radius:6px}
+
+/* --- MATH STYLING --- */
+.q-box{display:flex;flex-direction:column;gap:15px;margin-bottom:28px; padding: 20px; border-radius: 12px; border: 2px solid transparent; transition: all 0.2s;}
+.q-txt{font-size:1.4rem;font-weight:700;color:var(--t);line-height:1.4;}
+.tts-btn { background: #fff; border: 1px solid var(--b); color: var(--p); padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-shrink: 0; }
+.tts-btn:hover { background: var(--pl); border-color: var(--p); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
+.tts-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.highlight-active { background-color: var(--wab) !important; border-color: var(--a) !important; }
+input[type=text]{width:100%;max-width:280px;padding:14px;font-size:1.1rem;border:2px solid var(--b);border-radius:8px;outline:0;background:#f8fafc;color:var(--t);font-weight:500}
+input[type=text]:focus{border-color:var(--p);background:#fff;box-shadow:0 0 0 4px var(--pl)}
+.opts{display:grid;gap:14px}
+.lbl{display:flex;align-items:center;justify-content: space-between; padding:16px 20px;gap:15px;border:2px solid var(--b);border-radius:10px;cursor:pointer;background:#fff;transition:.2s}
+.lbl:hover{border-color:var(--p);background:#f8fafc}
+.lbl:has(input:checked){border-color:var(--p);background:var(--pl);box-shadow:0 0 0 1px var(--p)}
+.lbl-content { display: flex; align-items: center; gap: 15px; flex-grow: 1; font-size: 1.1rem;}
+input[type=radio],input[type=checkbox]{accent-color:var(--p);width:1.25em;height:1.25em;cursor:pointer}
+
+.mx-box{overflow-x:auto;border:2px solid var(--b);border-radius:10px;margin-top:15px}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th,td{padding:16px 20px;border-bottom:1px solid var(--b);text-align:center}
+th{background:#f8fafc;font-weight:700;color:var(--tm);font-size:.9rem;text-transform:uppercase}
+td:first-child{text-align:left;font-weight:600;border-right:1px solid var(--b);background:#fff;width:55%; font-size: 1.1rem;}
+tr.highlight-active td { background-color: var(--wab) !important; border-top: 1px solid var(--a); border-bottom: 1px solid var(--a); }
+
+/* --- VERTICAL MATH STYLING --- */
+.v-math { display: grid; grid-template-columns: auto auto; justify-content: center; align-items: end; column-gap: 15px; font-family: 'Courier New', monospace; font-size: 3.5rem; font-weight: 700; color: var(--t); line-height: 1; background: #fff; padding: 25px 50px; border-radius: 12px; border: 2px solid var(--b); width: fit-content; margin: 20px auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+.v-top { grid-column: 2; text-align: right; }
+.v-op { grid-column: 1; grid-row: 2; text-align: right; font-size: 2.8rem; transform: translateY(-5px); }
+.v-bot { grid-column: 2; grid-row: 2; text-align: right; }
+.v-line { grid-column: 1 / span 2; width: 100%; height: 4px; background: var(--t); border-radius: 2px; }
+
+/* --- VERTICAL FRACTION STYLING --- */
+.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; line-height: 1.1; font-size: 1.2em; }
+.frac span:first-child { border-bottom: 2px solid var(--t); padding: 0 5px; width: 100%; text-align: center; }
+.frac span:last-child { padding: 2px 5px 0 5px; }
+
+.model-box { background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid var(--b); margin-bottom: 15px; font-size: 1.1rem;}
+.model-box ul { margin: 10px 0 0 20px; padding: 0; }
+
+/* --- FEEDBACK --- */
+.fb{margin-top:30px;padding:25px;border-radius:10px;display:none;border-left:6px solid transparent;animation:sd .3s ease;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05)}
+@keyframes sd{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.fb.c{background:var(--okb);border-left-color:var(--ok);color:#064e3b}
+.fb.p{background:var(--wab);border-left-color:var(--wa);color:#78350f}
+.fb.i{background:var(--erb);border-left-color:var(--er);color:#7f1d1d}
+.fb-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;border-bottom:1px solid rgba(0,0,0,0.1);padding-bottom:10px;font-weight:800;text-transform:uppercase}
+.exp{background:rgba(255,255,255,0.6);padding:15px;border-radius:8px;font-size:1rem;line-height:1.6;border:1px solid rgba(0,0,0,0.08)}
+
+.btn{background:linear-gradient(to bottom,var(--p),var(--pd));color:#fff;border:0;padding:16px;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;width:100%;margin-top:30px;box-shadow:0 4px 6px rgba(37,99,235,0.3);transition:.2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 15px rgba(37,99,235,0.4)}
+
+/* --- RESULTS & REWARD --- */
+#res{padding:80px 40px;text-align:center;display:none}
+.gr-grid{background:#fff;border:2px solid var(--b);border-radius:16px;padding:40px;margin:40px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;box-shadow:0 10px 15px -3px rgba(0,0,0,0.05)}
+.stat{font-size:3.5rem;font-weight:900;color:var(--t);margin-bottom:8px;line-height:1}.stat-l{font-size:.85rem;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.1em}
+.g-a{color:var(--ok)}.g-b{color:var(--p)}.g-c{color:var(--wa)}.g-d{color:var(--er)}
+.reward-area { display:none; margin-bottom: 20px; }
+.reward-icon { font-size: 6rem; animation: bounce 1s infinite alternate; }
+@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+
+/* --- SCORE HISTORY MODAL --- */
+#score-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+.modal-content { background: #fff; width: 90%; max-width: 600px; border-radius: 16px; padding: 30px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-height: 80vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--b); padding-bottom: 15px; margin-bottom: 20px; }
+.modal-header h2 { margin: 0; color: var(--pd); font-weight: 800;}
+.close-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--tm); padding: 0 5px;}
+.close-btn:hover { color: var(--er); }
+.score-list { display: flex; flex-direction: column; gap: 12px; }
+.score-item { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px 20px; border-radius: 10px; border: 1px solid var(--b); }
+.score-details { display: flex; flex-direction: column; gap: 3px; }
+.score-date { font-weight: 700; color: var(--t); font-size: 1.05rem;}
+.score-pts { font-size: 0.9rem; color: var(--tm); }
+.score-badge { font-size: 1.15rem; font-weight: 800; padding: 6px 18px; border-radius: 20px; white-space: nowrap;}
+.badge-A { background: var(--okb); color: var(--ok); }
+.badge-B { background: var(--pl); color: var(--p); }
+.badge-C { background: var(--wab); color: var(--wa); }
+.badge-D { background: var(--erb); color: var(--er); }
+.empty-scores { text-align: center; color: var(--tm); padding: 30px 0; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div id="title-page">
+        <div class="math-decor">
+            <div class="sym sym-plus">+</div><div class="sym sym-minus">&minus;</div><div class="sym sym-mult">&times;</div><div class="sym sym-div">&divide;</div>
+        </div>
+        <div class="main-title">Mrs. Olivera's</div>
+        <div class="sub-title">5th Grade SBAC Math Review - NBT</div>
+        
+        <div class="set-grid">
+            <button class="set-btn" onclick="startQuiz('A')">Set A <span>Standard Review</span></button>
+            <button class="set-btn b" onclick="startQuiz('B')">Set B <span>Alternate Practice</span></button>
+        </div>
+
+        <button class="scores-btn" onclick="openScores()">View Saved Scores</button>
+    </div>
+
+    <header id="main-header">
+        <h1>Mrs. Olivera's Math Review</h1>
+        <div class="btn-group">
+            <button id="exit-btn" class="reset-btn" onclick="location.reload()">Exit Review</button>
+        </div>
+    </header>
+    <div class="pg-bar" id="pg"><div class="pg-fill" id="fill"></div></div>
+
+    <div id="quiz" class="q-card"></div>
+
+    <div id="res">
+        <div id="reward-area" class="reward-area">
+            <div class="reward-icon">🏆</div>
+            <h2 id="reward-msg" style="font-size:2.5rem; color:var(--a); margin-bottom:10px;">Mastery Unlocked!</h2>
+        </div>
+        <h2 style="font-size:2.2rem;margin:0 0 10px">Session Complete</h2>
+        <div id="msg" style="color:var(--tm);margin-bottom:30px;font-size:1.2rem"></div>
+        <div class="gr-grid">
+            <div><div class="stat" id="s-pts">0/0</div><div class="stat-l">Points</div></div>
+            <div><div class="stat" id="s-pct">0%</div><div class="stat-l">Score</div></div>
+            <div><div class="stat" id="s-gr">-</div><div class="stat-l">Grade</div></div>
+        </div>
+        <button class="btn" onclick="location.reload()" style="max-width:300px">Return to Menu</button>
+    </div>
+
+    <div id="score-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Score History</h2>
+                <button class="close-btn" onclick="closeScores()">&times;</button>
+            </div>
+            <div id="score-list" class="score-list">
+                </div>
+            <button onclick="clearHistory()" style="margin-top: 20px; width: 100%; padding: 12px; border-radius: 8px; background: var(--erb); color: var(--er); border: 2px solid var(--er); font-weight: 700; cursor: pointer; font-size: 1rem; transition: 0.2s;">
+                🗑️ Clear All Scores (Teacher Only)
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const speakerIcon = `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>`;
+
+    function clearHistory() {
+        const pin = prompt("Enter Teacher PIN to clear history:");
+        if (pin === "0425") {
+            localStorage.removeItem('mrsOliveraScores');
+            alert("History and saved scores cleared successfully.");
+            location.reload(); 
+        } else if (pin !== null) {
+            alert("Incorrect PIN. Access Denied.");
+        }
+    }
+
+    function openScores() {
+        const modal = document.getElementById('score-modal');
+        const list = document.getElementById('score-list');
+        const scores = JSON.parse(localStorage.getItem('mrsOliveraScores') || '[]');
+        
+        list.innerHTML = '';
+        if (scores.length === 0) {
+            list.innerHTML = `<div class="empty-scores">No scores saved yet. Complete a review to see your score here!</div>`;
+        } else {
+            scores.reverse().forEach(s => {
+                let grade = s.grade || "N/A";
+                let badgeClass = grade.startsWith('A') ? 'badge-A' : (grade.startsWith('B') ? 'badge-B' : (grade.startsWith('C') ? 'badge-C' : 'badge-D'));
+                let setName = s.set ? `Set ${s.set}` : "Review";
+                
+                list.innerHTML += `
+                    <div class="score-item">
+                        <div class="score-details">
+                            <span class="score-date">${s.date} (${setName})</span>
+                            <span class="score-pts">${s.pts} / ${s.tot} Points</span>
+                        </div>
+                        <div class="score-badge ${badgeClass}">${s.pct}% | ${grade}</div>
+                    </div>
+                `;
+            });
+        }
+        modal.style.display = 'flex';
+    }
+
+    function closeScores() {
+        document.getElementById('score-modal').style.display = 'none';
+    }
+
+    function saveScore(pts, tot, pct, grade, set) {
+        let scores = JSON.parse(localStorage.getItem('mrsOliveraScores') || '[]');
+        let d = new Date();
+        let dateString = d.toLocaleDateString() + ' at ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        scores.push({ date: dateString, pts: pts, tot: tot, pct: pct, grade: grade, set: set });
+        localStorage.setItem('mrsOliveraScores', JSON.stringify(scores));
+    }
+
+    const dataSetA = [
+        { id: 1, type: 'text', text: "Enter the product.", html: `<div class="v-math"><div class="v-top">27</div><div class="v-op">×</div><div class="v-bot">7</div><div class="v-line"></div></div>`, answer: ["189"], explanation: "27 × 7 = 189." },
+        { id: 2, type: 'comp', text: "Select the symbol (<, >, or =) that correctly completes each comparison.", rows: [{ t: "2.6 ? 2.7", c: "lt" }, { t: "1.2 ? 1.9", c: "lt" }, { t: "10.7 ? 10.4", c: "gt" }], explanation: "Compare the tenths place for each decimal." },
+        { id: 3, type: 'rad', text: "Kayla used mental math to find the product of $11.97 × 5, but she made a mistake. Her steps are shown.", html: `<div class="model-box"><ul><li>Step 1: Round $11.97 to $12.</li><li>Step 2: Multiply $12.00 × 5 = $60.00.</li><li>Step 3: Subtract $12.00 - $11.97 = $3.00.</li><li>Step 4: Subtract $60.00 - $3.00 = $57.00.</li></ul></div><p>Select the step in which Kayla made her first mistake.</p>`, options: ["Step 1", "Step 2", "Step 3", "Step 4"], answer: 2, explanation: "$12.00 - $11.97 is $0.03, not $3.00." },
+        { id: 4, type: 'rad', text: "Which number makes the inequality true?<br><br>8.364 > ____", options: ["8.40", "8.63", "8.359", "8.371"], answer: 2, explanation: "8.359 is the only option smaller than 8.364." },
+        { id: 5, type: 'text', text: "Enter the product.", html: `<h3>6.97 × 4</h3>`, answer: ["27.88"], explanation: "6.97 × 4 = 27.88." },
+        { id: 6, type: 'rad', text: "Jordan took his sister to the store. He uses a model to help her understand the amount of money they spent. <br>• Each large square represents $1.00.<br>• Each small square represents $0.25.", html: `<div class="model-box"><b>Before the store:</b> 5 large squares, 2 small squares ($5.50)<br><b>After the store:</b> 1 large square, 3 small squares ($1.75)</div><p>How much money did Jordan and his sister spend at the store?</p>`, options: ["$3.00", "$3.25", "$3.50", "$3.75"], answer: 3, explanation: "$5.50 - $1.75 = $3.75." },
+        { id: 7, type: 'rad', text: "Which equation has the same unknown value as 2.65 - □ = 0.63?", options: ["2.65 - 0.63 = □", "□ - 0.63 = 2.65", "2.65 + □ = 0.63", "0.63 - □ = 2.65"], answer: 0, explanation: "If 2.65 minus a number is 0.63, then 2.65 minus 0.63 equals that number." },
+        { id: 8, type: 'rad', text: "Which equation shows a correct strategy and product for the expression shown?<br><br>0.6 × 0.9", options: [
+            `<div class="frac"><span>6</span><span>10</span></div> &times; <div class="frac"><span>9</span><span>10</span></div> = <div class="frac"><span>54</span><span>10</span></div>`,
+            `<div class="frac"><span>6</span><span>10</span></div> &times; <div class="frac"><span>9</span><span>10</span></div> = <div class="frac"><span>54</span><span>100</span></div>`,
+            `<div class="frac"><span>6</span><span>100</span></div> &times; <div class="frac"><span>9</span><span>100</span></div> = <div class="frac"><span>54</span><span>100</span></div>`,
+            `<div class="frac"><span>6</span><span>100</span></div> &times; <div class="frac"><span>9</span><span>100</span></div> = <div class="frac"><span>54</span><span>10000</span></div>`
+        ], answer: 1, explanation: "0.6 is six tenths (6 over 10) and 0.9 is nine tenths (9 over 10). 6 × 9 = 54, and 10 × 10 = 100, resulting in 54 over 100." },
+        { id: 9, type: 'comp', text: "Select the symbol (<, >, or =) that correctly completes each comparison.", rows: [{ t: "0.08 ? 0.8", c: "lt" }, { t: "42.9 ? 42.900", c: "eq" }, { t: "50.671 ? 50.67", c: "gt" }], explanation: "Line up the decimals to compare place values." },
+        { id: 10, type: 'text', text: "Enter the number that makes the equation true.", html: `<div style="font-size: 1.8rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 20px 0; font-weight: bold;"><div class="frac"><span>7826</span><span>12</span></div> = <div class="frac"><span>7200</span><span>12</span></div> + <div class="frac"><span style="color:var(--p);">?</span><span>12</span></div> + <div class="frac"><span>24</span><span>12</span></div> + <div class="frac"><span>2</span><span>12</span></div></div>`, answer: ["600"], explanation: "7200 + 600 + 24 + 2 = 7826." },
+        { id: 11, type: 'text', text: "Clara bought 3 packs of pencils, 2 erasers, and 1 notebook.", html: `<div class="mx-box"><table><tr><th>Item</th><th>Cost</th></tr><tr><td>Pack of Pencils</td><td>$2.48</td></tr><tr><td>Notebook</td><td>$3.49</td></tr><tr><td>Eraser</td><td>$1.78</td></tr></table></div><p>She gave the clerk a $20.00 bill. How much change should she receive? Enter your answer.</p>`, answer: ["5.51", "$5.51", "5.51 "], explanation: "Total cost = (3 × $2.48) + (2 × $1.78) + $3.49 = $14.49. Change = $20.00 - $14.49 = $5.51." },
+        { id: 12, type: 'text2', text: "What numbers correctly complete each equation? All squares have the same value.", html: `<h3>□ + □ = 10.5</h3><h3>◯ - 3.25 = □</h3>`, answer: [["5.25"], ["8.5", "8.50"]], explanation: "□ + □ = 10.5 means □ is 5.25. Plugging that in: ◯ - 3.25 = 5.25, so ◯ = 8.5." },
+        { id: 13, type: 'text', text: "Enter the unknown value in the equation.", html: `<h3>□ - 20.8 = 41.06</h3>`, answer: ["61.86"], explanation: "Add 20.8 to 41.06 to find the unknown value: 61.86." },
+        { id: 14, type: 'rad', text: "Which equation has the same unknown value as 46.5 - 17.32 = □?", options: ["□ - 17.32 = 46.5", "17.32 + □ = 46.5", "□ - 46.5 = 17.32", "46.5 + □ = 17.32"], answer: 1, explanation: "Addition is the inverse operation. If 46.5 - 17.32 = □, then 17.32 + □ = 46.5." },
+        { id: 15, type: 'mat', text: "Determine if each comparison is true or false. Select True or False for each comparison.", rows: [{ t: "6.3 = 6.33", c: "false" }, { t: "5.7 > 1.96", c: "true" }, { t: "6.8 < 9.5", c: "true" }], explanation: "Compare the place values carefully from left to right." }
+    ];
+
+    const dataSetB = [
+        { id: 1, type: 'text', text: "Enter the product.", html: `<div class="v-math"><div class="v-top">34</div><div class="v-op">×</div><div class="v-bot">6</div><div class="v-line"></div></div>`, answer: ["204"], explanation: "34 × 6 = 204." },
+        { id: 2, type: 'comp', text: "Select the symbol (<, >, or =) that correctly completes each comparison.", rows: [{ t: "3.4 ? 3.5", c: "lt" }, { t: "4.1 ? 4.8", c: "lt" }, { t: "12.5 ? 12.2", c: "gt" }], explanation: "Compare the tenths place for each decimal." },
+        { id: 3, type: 'rad', text: "Kayla used mental math to find the product of $19.95 × 4, but she made a mistake. Her steps are shown.", html: `<div class="model-box"><ul><li>Step 1: Round $19.95 to $20.</li><li>Step 2: Multiply $20.00 × 4 = $80.00.</li><li>Step 3: Subtract $20.00 - $19.95 = $5.00.</li><li>Step 4: Subtract $80.00 - $5.00 = $75.00.</li></ul></div><p>Select the step in which Kayla made her first mistake.</p>`, options: ["Step 1", "Step 2", "Step 3", "Step 4"], answer: 2, explanation: "$20.00 - $19.95 is $0.05, not $5.00." },
+        { id: 4, type: 'rad', text: "Which number makes the inequality true?<br><br>7.245 > ____", options: ["7.30", "7.51", "7.238", "7.251"], answer: 2, explanation: "7.238 is the only option smaller than 7.245." },
+        { id: 5, type: 'text', text: "Enter the product.", html: `<h3>5.98 × 3</h3>`, answer: ["17.94"], explanation: "5.98 × 3 = 17.94." },
+        { id: 6, type: 'rad', text: "Jordan took his sister to the store. He uses a model to help her understand the amount of money they spent. <br>• Each large square represents $1.00.<br>• Each small square represents $0.25.", html: `<div class="model-box"><b>Before the store:</b> 6 large squares, 3 small squares ($6.75)<br><b>After the store:</b> 2 large squares, 1 small square ($2.25)</div><p>How much money did Jordan and his sister spend at the store?</p>`, options: ["$4.00", "$4.25", "$4.50", "$4.75"], answer: 2, explanation: "$6.75 - $2.25 = $4.50." },
+        { id: 7, type: 'rad', text: "Which equation has the same unknown value as 3.75 - □ = 0.42?", options: ["3.75 - 0.42 = □", "□ - 0.42 = 3.75", "3.75 + □ = 0.42", "0.42 - □ = 3.75"], answer: 0, explanation: "If 3.75 minus a number is 0.42, then 3.75 minus 0.42 equals that number." },
+        { id: 8, type: 'rad', text: "Which equation shows a correct strategy and product for the expression shown?<br><br>0.7 × 0.8", options: [
+            `<div class="frac"><span>7</span><span>10</span></div> &times; <div class="frac"><span>8</span><span>10</span></div> = <div class="frac"><span>56</span><span>10</span></div>`,
+            `<div class="frac"><span>7</span><span>10</span></div> &times; <div class="frac"><span>8</span><span>10</span></div> = <div class="frac"><span>56</span><span>100</span></div>`,
+            `<div class="frac"><span>7</span><span>100</span></div> &times; <div class="frac"><span>8</span><span>100</span></div> = <div class="frac"><span>56</span><span>100</span></div>`,
+            `<div class="frac"><span>7</span><span>100</span></div> &times; <div class="frac"><span>8</span><span>100</span></div> = <div class="frac"><span>56</span><span>10000</span></div>`
+        ], answer: 1, explanation: "0.7 is seven tenths (7 over 10) and 0.8 is eight tenths (8 over 10). 7 × 8 = 56, and 10 × 10 = 100, resulting in 56 over 100." },
+        { id: 9, type: 'comp', text: "Select the symbol (<, >, or =) that correctly completes each comparison.", rows: [{ t: "0.05 ? 0.5", c: "lt" }, { t: "37.4 ? 37.400", c: "eq" }, { t: "60.831 ? 60.83", c: "gt" }], explanation: "Line up the decimals to compare place values." },
+        { id: 10, type: 'text', text: "Enter the number that makes the equation true.", html: `<div style="font-size: 1.8rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 20px 0; font-weight: bold;"><div class="frac"><span>8535</span><span>15</span></div> = <div class="frac"><span>7500</span><span>15</span></div> + <div class="frac"><span style="color:var(--p);">?</span><span>15</span></div> + <div class="frac"><span>30</span><span>15</span></div> + <div class="frac"><span>5</span><span>15</span></div></div>`, answer: ["1000"], explanation: "7500 + 1000 + 30 + 5 = 8535." },
+        { id: 11, type: 'text', text: "Clara bought 2 packs of pencils, 3 erasers, and 1 notebook.", html: `<div class="mx-box"><table><tr><th>Item</th><th>Cost</th></tr><tr><td>Pack of Pencils</td><td>$1.99</td></tr><tr><td>Notebook</td><td>$4.50</td></tr><tr><td>Eraser</td><td>$1.25</td></tr></table></div><p>She gave the clerk a $20.00 bill. How much change should she receive? Enter your answer.</p>`, answer: ["7.77", "$7.77", "7.77 "], explanation: "Total cost = (2 × $1.99) + (3 × $1.25) + $4.50 = $12.23. Change = $20.00 - $12.23 = $7.77." },
+        { id: 12, type: 'text2', text: "What numbers correctly complete each equation? All squares have the same value.", html: `<h3>□ + □ = 12.4</h3><h3>◯ - 2.50 = □</h3>`, answer: [["6.2", "6.20"], ["8.7", "8.70"]], explanation: "□ + □ = 12.4 means □ is 6.2. Plugging that in: ◯ - 2.50 = 6.2, so ◯ = 8.7." },
+        { id: 13, type: 'text', text: "Enter the unknown value in the equation.", html: `<h3>□ - 15.4 = 32.08</h3>`, answer: ["47.48"], explanation: "Add 15.4 to 32.08 to find the unknown value: 47.48." },
+        { id: 14, type: 'rad', text: "Which equation has the same unknown value as 58.4 - 21.65 = □?", options: ["□ - 21.65 = 58.4", "21.65 + □ = 58.4", "□ - 58.4 = 21.65", "58.4 + □ = 21.65"], answer: 1, explanation: "Addition is the inverse operation. If 58.4 - 21.65 = □, then 21.65 + □ = 58.4." },
+        { id: 15, type: 'mat', text: "Determine if each comparison is true or false. Select True or False for each comparison.", rows: [{ t: "4.2 = 4.22", c: "false" }, { t: "8.5 > 2.87", c: "true" }, { t: "3.9 < 7.4", c: "true" }], explanation: "Compare the place values carefully from left to right." }
+    ];
+
+    let activeQuestions = [];
+    let currentQ = 0;
+    let earnedPoints = 0;
+    let totalPointsPossible = 0;
+    let btnLocked = false;
+    let currentlyHighlighted = null;
+    let currentSet = '';
+
+    function speakText(text, btnElement, containerId) {
+        window.speechSynthesis.cancel();
+        
+        if (currentlyHighlighted) {
+            currentlyHighlighted.classList.remove('highlight-active');
+        }
+
+        let container = null;
+        if (containerId) {
+            container = document.getElementById(containerId);
+        } else if (btnElement) {
+            container = btnElement.closest('.lbl') || 
+                        btnElement.closest('.q-box') || 
+                        btnElement.closest('tr');
+        }
+
+        if (container) {
+            container.classList.add('highlight-active');
+            currentlyHighlighted = container;
+        }
+
+        let spokenText = text;
+        
+        spokenText = spokenText.replace(/<div class="frac">.*?<span[^>]*>(.*?)<\/span>.*?<span[^>]*>(.*?)<\/span>.*?<\/div>/g, " $1 over $2 ");
+        spokenText = spokenText.replace(/<[^>]*>?/gm, ' '); 
+
+        spokenText = spokenText.replace(/÷/g, " divided by ");
+        spokenText = spokenText.replace(/×/g, " times ");
+        spokenText = spokenText.replace(/□/g, " box ");
+        spokenText = spokenText.replace(/◯/g, " circle ");
+        spokenText = spokenText.replace(/=/g, " equals ");
+        spokenText = spokenText.replace(/\+/g, " plus ");
+        spokenText = spokenText.replace(/-/g, " minus ");
+
+        const utterance = new SpeechSynthesisUtterance(spokenText.trim());
+        utterance.rate = 1.0; 
+        
+        utterance.onend = () => {
+            if (container) container.classList.remove('highlight-active');
+            currentlyHighlighted = null;
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function enableExitGuard() { window.onbeforeunload = () => "Are you sure?"; }
+    function disableExitGuard() { window.onbeforeunload = null; }
+
+    function startQuiz(setMode) {
+        try {
+            currentSet = setMode;
+            let rawData = (setMode === 'A') ? dataSetA : dataSetB;
+            activeQuestions = shuffleArray(JSON.parse(JSON.stringify(rawData)));
+            
+            currentQ = 0;
+            earnedPoints = 0;
+            
+            totalPointsPossible = activeQuestions.reduce((sum, q) => {
+                if (q.type === 'mat' || q.type === 'comp') return sum + q.rows.length;
+                if (q.type === 'chk') return sum + q.answer.length; 
+                if (q.type === 'text2') return sum + 2;
+                return sum + 1;
+            }, 0);
+
+            document.getElementById('title-page').style.display = 'none';
+            document.getElementById('main-header').style.display = 'flex';
+            document.getElementById('pg').style.display = 'block';
+            document.getElementById('quiz').style.display = 'block';
+            enableExitGuard();
+            
+            renderQuestion();
+        } catch(e) {
+            alert("Error loading quiz: " + e.message);
+        }
+    }
+
+    function renderQuestion() {
+        btnLocked = false;
+        const q = activeQuestions[currentQ];
+        const area = document.getElementById('quiz');
+        area.innerHTML = '';
+
+        const card = document.createElement('div');
+        card.className = 'q-card active';
+
+        let maxPts;
+        if (q.type === 'mat' || q.type === 'comp') maxPts = q.rows.length;
+        else if (q.type === 'chk') maxPts = q.answer.length;
+        else if (q.type === 'text2') maxPts = 2;
+        else maxPts = 1;
+
+        const safeQText = q.text.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+
+        let html = `
+            <div class="meta">
+                <span class="bdg">Set ${currentSet} &bull; Question ${currentQ + 1} of ${activeQuestions.length}</span>
+                <span class="pts">${maxPts} Pt${maxPts > 1 ? 's' : ''}</span>
+            </div>
+            
+            <div class="q-box">
+                <div class="q-header-row">
+                    <div class="q-txt">${q.text}</div>
+                    <button class="tts-btn" onclick="speakText('${safeQText}', this)">${speakerIcon} Listen</button>
+                </div>`;
+        
+        if (q.html) html += q.html;
+        if (q.subtext) html += `<p style="color:#64748b; font-size:0.9rem; margin-top:5px;">${q.subtext}</p>`;
+        
+        html += `</div>`;
+
+        if (q.type === 'text') {
+            html += `<input type="text" id="ans-text" placeholder="Type answer..." autocomplete="off">`;
+        } else if (q.type === 'text2') {
+            html += `
+            <div style="display:flex; flex-direction:column; gap:15px; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid var(--b);">
+                <div style="display:flex; align-items:center; gap: 10px; font-weight: bold; font-size: 1.1rem;">
+                    <label style="flex:1;">Number for squares (First box): </label>
+                    <input type="text" id="ans-text-1" placeholder="..." style="flex:1; max-width: 150px;" autocomplete="off">
+                </div>
+                <div style="display:flex; align-items:center; gap: 10px; font-weight: bold; font-size: 1.1rem;">
+                    <label style="flex:1;">Number for circle (Second box): </label>
+                    <input type="text" id="ans-text-2" placeholder="..." style="flex:1; max-width: 150px;" autocomplete="off">
+                </div>
+            </div>`;
+        } else if (q.type === 'rad') {
+            let opts = q.options.map((t, i) => ({ txt: t, idx: i }));
+            html += `<div class="opts">`;
+            opts.forEach((opt) => {
+                const safeOptTxt = opt.txt.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+                html += `
+                <label class="lbl">
+                    <div class="lbl-content">
+                        <input type="radio" name="opt" value="${opt.idx}"> 
+                        <span>${opt.txt}</span>
+                    </div>
+                    <button class="tts-btn" onclick="speakText('${safeOptTxt}', this)">${speakerIcon} Listen</button>
+                </label>`;
+            });
+            html += `</div>`;
+        } else if (q.type === 'chk') {
+            let opts = q.options.map((t, i) => ({ txt: t, idx: i }));
+            shuffleArray(opts);
+            html += `<div class="opts">`;
+            opts.forEach((opt) => {
+                const safeOptTxt = opt.txt.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+                html += `
+                <label class="lbl">
+                    <div class="lbl-content">
+                        <input type="checkbox" name="chk" value="${opt.idx}"> 
+                        <span>${opt.txt}</span>
+                    </div>
+                    <button class="tts-btn" onclick="speakText('${safeOptTxt}', this)">${speakerIcon} Listen</button>
+                </label>`;
+            });
+            html += `</div>`;
+        } else if (q.type === 'mat') {
+            let rows = [...q.rows];
+            shuffleArray(rows);
+            html += `<div class="mx-box"><table>
+                <thead><tr><th>Statement</th><th>True</th><th>False</th></tr></thead>
+                <tbody>`;
+            rows.forEach((row, i) => {
+                const safeRowTxt = row.t.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+                html += `<tr data-c="${row.c}">
+                    <td>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>${row.t}</span>
+                            <button class="tts-btn" onclick="speakText('${safeRowTxt}', this)">${speakerIcon} Listen</button>
+                        </div>
+                    </td>
+                    <td><input type="radio" name="mx${i}" value="true"></td>
+                    <td><input type="radio" name="mx${i}" value="false"></td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+        } else if (q.type === 'comp') {
+            let rows = [...q.rows];
+            html += `<div class="mx-box"><table>
+                <thead><tr><th>Comparison</th><th style="font-size:1.4rem;">&lt;</th><th style="font-size:1.4rem;">&gt;</th><th style="font-size:1.4rem;">=</th></tr></thead>
+                <tbody>`;
+            rows.forEach((row, i) => {
+                const safeRowTxt = row.t.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+                html += `<tr data-c="${row.c}">
+                    <td>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>${row.t}</span>
+                            <button class="tts-btn" onclick="speakText('${safeRowTxt}', this)">${speakerIcon} Listen</button>
+                        </div>
+                    </td>
+                    <td><input type="radio" name="mx${i}" value="lt"></td>
+                    <td><input type="radio" name="mx${i}" value="gt"></td>
+                    <td><input type="radio" name="mx${i}" value="eq"></td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+        }
+
+        html += `<div id="fb" class="fb"></div>`;
+        html += `<button id="sbtn" class="btn" onclick="check()">Submit Answer</button>`;
+        
+        card.innerHTML = html;
+        area.appendChild(card);
+        
+        const pct = ((currentQ) / activeQuestions.length) * 100;
+        document.getElementById('fill').style.width = pct + '%';
+    }
+
+    function check() {
+        if (btnLocked) {
+            if (currentQ < activeQuestions.length - 1) {
+                currentQ++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+            return;
+        }
+
+        const q = activeQuestions[currentQ];
+        
+        // --- VALIDATION ---
+        let valid = false;
+        if (q.type === 'text') {
+            if (document.getElementById('ans-text').value.trim().length > 0) valid = true;
+        } else if (q.type === 'text2') {
+            if (document.getElementById('ans-text-1').value.trim().length > 0 && document.getElementById('ans-text-2').value.trim().length > 0) valid = true;
+        } else if (q.type === 'rad') {
+            if (document.querySelector('input[name="opt"]:checked')) valid = true;
+        } else if (q.type === 'chk') {
+            if (document.querySelector('input[name="chk"]:checked')) valid = true;
+        } else if (q.type === 'mat' || q.type === 'comp') {
+            const rows = document.querySelectorAll('tbody tr');
+            let all = true;
+            rows.forEach((tr, i) => {
+                if (!tr.querySelector(`input[name="mx${i}"]:checked`)) all = false;
+            });
+            valid = all;
+        }
+
+        if (!valid) {
+            alert("Please provide an answer for all parts of the question before submitting.");
+            return;
+        }
+        // ------------------
+
+        const fb = document.getElementById('fb');
+        let pts = 0;
+        let max = 1;
+
+        if (q.type === 'text') {
+            const val = document.getElementById('ans-text').value.trim().replace(/,/g, '');
+            if (q.answer.includes(val)) pts = 1;
+        } else if (q.type === 'text2') {
+            max = 2;
+            const val1 = document.getElementById('ans-text-1').value.trim();
+            const val2 = document.getElementById('ans-text-2').value.trim();
+            if (q.answer[0].includes(val1)) pts++;
+            if (q.answer[1].includes(val2)) pts++;
+        } else if (q.type === 'rad') {
+            const el = document.querySelector('input[name="opt"]:checked');
+            if (el && parseInt(el.value) === q.answer) pts = 1;
+        } else if (q.type === 'chk') {
+            max = q.answer.length;
+            const els = Array.from(document.querySelectorAll('input[name="chk"]:checked')).map(e => parseInt(e.value));
+            
+            let correctCount = 0;
+            let wrongCount = 0;
+            
+            els.forEach(val => {
+                if (q.answer.includes(val)) correctCount++;
+                else wrongCount++;
+            });
+
+            pts = Math.max(0, correctCount - wrongCount);
+            
+        } else if (q.type === 'mat' || q.type === 'comp') {
+            max = q.rows.length;
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach((tr, i) => {
+                const el = tr.querySelector(`input[name="mx${i}"]:checked`);
+                if (el && el.value === tr.dataset.c) pts++;
+            });
+        }
+
+        earnedPoints += pts;
+
+        fb.style.display = 'block';
+        fb.className = `fb ${pts===max ? 'c' : (pts>0 ? 'p' : 'i')}`;
+        
+        const safeExp = q.explanation.replace(/"/g, '&quot;').replace(/'/g, "\\'").replace(/<br>/g, " ");
+
+        fb.innerHTML = `
+            <div class="fb-head">
+                <span>${pts>0 ? '+'+pts : '0'} Pts &bull; ${pts===max ? 'Correct!' : (pts>0 ? 'Partial Credit' : 'Incorrect')}</span>
+                <button class="tts-btn" onclick="speakText('${safeExp}', this)">🔊 Listen</button>
+            </div>
+            <div class="exp">
+                <b>Explanation:</b><br>
+                ${q.explanation}
+            </div>`;
+
+        document.getElementById('sbtn').innerText = (currentQ < activeQuestions.length - 1) ? "Next Question" : "View Results";
+        btnLocked = true;
+    }
+
+    function showResults() {
+        disableExitGuard();
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('res').style.display = 'block';
+        document.getElementById('fill').style.width = '100%';
+
+        document.getElementById('s-pts').innerText = `${earnedPoints}/${totalPointsPossible}`;
+        const percent = Math.round((earnedPoints / totalPointsPossible) * 100);
+        document.getElementById('s-pct').innerText = `${percent}%`;
+
+        let l = 'F', c = 'g-d', m = "Keep practicing. You can do this!";
+        
+        if (percent >= 97) { l = 'A+'; c = 'g-a'; m = "Outstanding! Perfect mastery."; }
+        else if (percent >= 93) { l = 'A'; c = 'g-a'; m = "Excellent work!"; }
+        else if (percent >= 90) { l = 'A-'; c = 'g-a'; m = "Great job! Very strong understanding."; }
+        else if (percent >= 87) { l = 'B+'; c = 'g-b'; m = "Very good effort!"; }
+        else if (percent >= 83) { l = 'B'; c = 'g-b'; m = "Good job! You're getting the hang of it."; }
+        else if (percent >= 80) { l = 'B-'; c = 'g-b'; m = "Solid work, keep it up!"; }
+        else if (percent >= 70) { l = 'C'; c = 'g-c'; m = "Fair job. A little more review will help."; }
+        else if (percent >= 60) { l = 'D'; c = 'g-d'; m = "Almost there. Try again!"; }
+
+        const el = document.getElementById('s-gr');
+        el.innerText = l;
+        el.className = `stat ${c}`;
+        document.getElementById('msg').innerText = m;
+
+        if (percent >= 80) {
+            document.getElementById('reward-area').style.display = 'block';
+            document.getElementById('reward-msg').innerText = percent >= 90 ? "Excellent Mastery!" : "Solid Achievement!";
+            
+            if (percent >= 90) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            } else {
+                confetti({ particleCount: 50, spread: 45, origin: { y: 0.7 }, scalar: 0.8 });
+            }
+        }
+
+        // Save the score locally
+        saveScore(earnedPoints, totalPointsPossible, percent, l, currentSet);
+    }
+</script>
+</body>
+</html>
